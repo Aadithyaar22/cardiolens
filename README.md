@@ -292,7 +292,7 @@ MIT License — free to use, modify, and distribute with attribution.
       <br>
       <strong>Aadithya A R</strong><br>
       <sub>B.Tech CSE (AI & ML)</sub><br>
-      <sub>Global Academy of Technology, Bengaluru · Batch 2023–2027</sub><br>
+      <sub>Global Academy of Technology, Bengaluru</sub><br>
       <sub>ML Pipeline · XAI Engine · Clinical Reasoning · Dashboard · MongoDB · Deployment</sub><br><br>
       <a href="https://github.com/Aadithyaar22">
         <img src="https://img.shields.io/badge/GitHub-Aadithyaar22-black?logo=github&style=flat-square" />
@@ -302,7 +302,7 @@ MIT License — free to use, modify, and distribute with attribution.
       <br>
       <strong>Yadunandan</strong><br>
       <sub>B.Tech CSE (AI & ML)</sub><br>
-      <sub>Global Academy of Technology, Bengaluru</sub><br><br>
+      <sub>Global Academy of Technology, Bengaluru</sub><br>
       <sub>Co-Builder · Project Architecture · Research · Testing · Validation</sub><br><br>
       <a href="https://github.com/yadu080">
         <img src="https://img.shields.io/badge/GitHub-Yadunandan-black?logo=github&style=flat-square" />
