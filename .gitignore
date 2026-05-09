@@ -5,10 +5,9 @@ venv/
 .env
 .DS_Store
 .ipynb_checkpoints/
-reports/champion_model.joblib
-reports/metrics.json
 reports/*.pdf
 data/*.csv
 data/*.data
 .azureml/
 *.joblib
+
