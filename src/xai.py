@@ -248,21 +248,20 @@ def _analyse_feature(feature: str, raw_val: float, shap_val: float) -> dict:
 
     elif feature == "slope":
         sl = int(raw_val)
-        labels = {1:"Upsloping",2:"Flat",3:"Downsloping"}
         if sl == 3:
-            d.update(dict(what_it_is=f"ST slope: Downsloping (Most abnormal pattern)",
+            d.update(dict(what_it_is="ST slope: Downsloping (Most abnormal pattern)",
                 what_it_means="ST segment slopes downward during peak exercise — the most ominous ECG pattern in stress testing.",
                 mechanism="Downsloping ST depression reflects widespread subendocardial ischaemia during peak demand. It is more specific for obstructive CAD than horizontal or upsloping depression. The degree of slope correlates with the haemodynamic severity of coronary stenosis.",
                 consequence="Downsloping ST depression has the highest positive predictive value for obstructive multi-vessel CAD among all stress ECG findings. It is an indication for urgent further evaluation — angiography is typically the next step.",
                 severity="high"))
         elif sl == 2:
-            d.update(dict(what_it_is=f"ST slope: Flat (Borderline abnormal)",
+            d.update(dict(what_it_is="ST slope: Flat (Borderline abnormal)",
                 what_it_means="Flat ST segment at peak exercise — borderline abnormal and clinically significant in context.",
                 mechanism="Flat ST depression suggests subendocardial ischaemia during peak demand. Less specific than downsloping but still associated with significant CAD, particularly when combined with other positive findings.",
                 consequence="Warrants further evaluation, especially combined with other risk markers. Positive predictive value improves substantially when other test findings are also abnormal.",
                 severity="moderate"))
         else:
-            d.update(dict(what_it_is=f"ST slope: Upsloping (Normal pattern)",
+            d.update(dict(what_it_is="ST slope: Upsloping (Normal pattern)",
                 what_it_means="ST segment slopes upward during exercise — a normal physiological response.",
                 mechanism="Upsloping ST change during exercise, particularly if mild, is considered benign. The heart's electrical recovery accelerates appropriately with increased heart rate.",
                 consequence="Upsloping pattern reduces the probability of significant ischaemia. Combined with other normal findings, it suggests an adequate myocardial stress response.",

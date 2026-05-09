@@ -6,7 +6,7 @@ Run from repo root:
 """
 
 from __future__ import annotations
-import sys, json, os, time
+import sys, json, os
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -40,7 +40,6 @@ except Exception:
     MONGO_AVAILABLE = False
 
 try:
-    import requests as _req
     AZURE_URI  = os.getenv("AZURE_ENDPOINT_URI", "")
     AZURE_KEY  = os.getenv("AZURE_ENDPOINT_KEY", "")
     AZURE_AVAILABLE = bool(AZURE_URI and AZURE_KEY)
@@ -950,8 +949,7 @@ with tab4:
     else:
         try:
             from mongo.analytics import (recent_predictions, tier_counts,
-                                          common_high_risk_features,
-                                          predictions_in_window)
+                                          common_high_risk_features)
             col1,col2=st.columns(2,gap="large")
 
             with col1:
