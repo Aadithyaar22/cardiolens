@@ -292,8 +292,7 @@ MIT License — free to use, modify, and distribute with attribution.
       <br>
       <strong>Aadithya A R</strong><br>
       <sub>B.Tech CSE (AI & ML)</sub><br>
-      <sub>Global Academy of Technology, Bengaluru · Batch 2023–2027</sub><br>
-      <sub>Agentic AI Intern · Innomatics Research Labs</sub><br><br>
+      <sub>Global Academy of Technology, Bengaluru</sub><br>
       <sub>ML Pipeline · XAI Engine · Clinical Reasoning · Dashboard · MongoDB · Deployment</sub><br><br>
       <a href="https://github.com/Aadithyaar22">
         <img src="https://img.shields.io/badge/GitHub-Aadithyaar22-black?logo=github&style=flat-square" />
@@ -301,11 +300,11 @@ MIT License — free to use, modify, and distribute with attribution.
     </td>
     <td align="center" width="50%">
       <br>
-      <strong>Yadunandan</strong><br>
-      <sub>B.Tech CSE</sub><br>
-      <sub>Global Academy of Technology, Bengaluru</sub><br><br>
+      <strong>Yadunandan M Nimbalkar</strong><br>
+      <sub>B.Tech CSE (AI & ML)</sub><br>
+      <sub>Global Academy of Technology, Bengaluru</sub><br>
       <sub>Co-Builder · Project Architecture · Research · Testing · Validation</sub><br><br>
-      <a href="https://github.com">
+      <a href="https://github.com/yadu080">
         <img src="https://img.shields.io/badge/GitHub-Yadunandan-black?logo=github&style=flat-square" />
       </a>
     </td>
@@ -315,6 +314,5 @@ MIT License — free to use, modify, and distribute with attribution.
 <br>
 
 <div align="center">
-  <sub>Built with ❤️ at Global Academy of Technology, Bengaluru, India</sub><br><br>
   <sub>⭐ Star this repo if you found it useful</sub>
 </div>
