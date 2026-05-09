@@ -1,218 +1,320 @@
 # 🫀 CardioLens
 
-> **A production-grade heart disease risk assessment platform with explainable AI, calibrated probabilities, counterfactual reasoning, conformal prediction intervals — and a full MLOps spine on Azure ML and MongoDB Atlas.**
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-cardiolens--heart.streamlit.app-red?logo=streamlit&logoColor=white)](https://cardiolens-heart.streamlit.app)
+[![GitHub](https://img.shields.io/badge/GitHub-Aadithyaar22%2Fcardiolens-black?logo=github)](https://github.com/Aadithyaar22/cardiolens)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://python.org)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb&logoColor=white)](https://mongodb.com/atlas)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Deployed-FF4B4B?logo=streamlit&logoColor=white)](https://cardiolens-heart.streamlit.app)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-CardioLens is not a Jupyter notebook with a single Random Forest. It is a four-tier system: a calibrated ensemble pipeline at the core, a multi-explainer XAI layer (SHAP + LIME + counterfactuals), a Streamlit clinical dashboard, and a cloud deployment story that pairs MongoDB as a clinical data layer with Azure ML as the inference and monitoring backbone.
-
-Every architectural choice — calibration, conformal intervals, fairness audit, dynamic model loading from Blob Storage, structured logs into Application Insights — exists to answer a specific question that comes up in real ML systems and in real interviews.
+> **A production-grade heart disease risk assessment platform — not a notebook, a system.**
+> Calibrated ML · Deep Clinical XAI · Conformal Prediction · MongoDB Atlas · Live on Streamlit Cloud.
 
 ---
 
-## ✨ What makes this different from a typical college project
+## 🌐 Live Demo
 
-| Most college projects | CardioLens |
+**[https://cardiolens-heart.streamlit.app](https://cardiolens-heart.streamlit.app)**
+
+Enter any patient profile → get an instantaneous risk score, full clinical explanation of every contributing factor, a "what-if" counterfactual showing what to change, a 90% prediction interval with mathematical guarantee, and a downloadable PDF clinical report.
+
+---
+
+## 🎯 What CardioLens Does
+
+| Output | Description |
 |---|---|
-| Single model, single accuracy number | Four candidates, stratified CV, isotonic calibration, **Brier score reported alongside accuracy** |
-| SHAP bar chart, that's it | SHAP waterfall + beeswarm + force, **LIME as cross-check**, **SHAP interaction values**, **counterfactual narratives** |
-| Point-prediction only | **Split-conformal prediction intervals** with formal coverage guarantee |
-| Demo notebook | Streamlit dashboard with risk gauge, radar chart, **per-patient PDF report** |
-| Local Flask app | **Azure ML Managed Endpoint** + **Blob model registry** + **App Insights monitoring** |
-| No persistence | **MongoDB Atlas** with prediction history, tier analytics, and an in-house model registry |
-| No fairness story | Subgroup AUC/recall audit across sex |
+| **Risk Score** | Calibrated probability of heart disease (0–100%) |
+| **Risk Tier** | Low / Moderate / High / Critical with clinical guidance |
+| **SHAP Explanation** | Per-feature attribution — which factors drove this specific prediction |
+| **LIME Cross-check** | Independent second explainer validating SHAP |
+| **Deep Clinical Reasoning** | What the value means → how it affects the heart → what it leads to |
+| **Combined Verdict** | Synthesised medical conclusion across all top factors |
+| **Counterfactual** | "If cholesterol drops from X to Y, risk falls from 74% to 28%" |
+| **Prediction Interval** | 90% conformal interval — a mathematical guarantee |
+| **PDF Report** | Downloadable clinical-grade patient report |
+| **MongoDB Persistence** | Every prediction saved with full metadata for cohort analysis |
+
+---
+
+## ✨ What Makes This Different
+
+| Typical college project | CardioLens |
+|---|---|
+| Single model, one accuracy number | 4 models, 5-fold CV, isotonic calibration, Brier score |
+| SHAP bar chart | SHAP + LIME + interaction values + counterfactuals + conformal intervals |
+| "The model predicted X" | Full clinical reasoning: mechanism → consequence → action |
+| Point estimate only | 90% prediction interval with formal coverage guarantee |
+| Local notebook | Live deployed at cardiolens-heart.streamlit.app |
+| No persistence | MongoDB Atlas: patient history, tier analytics, cohort insights |
+| No fairness analysis | Subgroup AUC and recall audit across sex |
 
 ---
 
 ## 🏗 Architecture
 
 ```
-                 ┌──────────────────────────┐
-                 │   Streamlit Dashboard    │
-                 │   (sliders, gauges,      │
-                 │   radar, SHAP, PDF)      │
-                 └────────────┬─────────────┘
-                              │
-                              ▼
-        ┌──────────────────────────────────────────┐
-        │       CardioLens Inference Layer         │
-        │  ┌────────────┐  ┌──────────────────┐   │
-        │  │ Calibrated │  │  XAI: SHAP +     │   │
-        │  │  champion  │  │  LIME +          │   │
-        │  │  (refit on │  │  Counterfactuals │   │
-        │  │   train+val)│ │  + Conformal     │   │
-        │  └─────┬──────┘  └─────────┬────────┘   │
-        └────────┼────────────────────┼────────────┘
-                 │                    │
-                 ▼                    ▼
-   ┌──────────────────────┐  ┌──────────────────────┐
-   │  MongoDB Atlas       │  │  Azure ML Online     │
-   │  • predictions       │  │   Endpoint           │
-   │  • model_registry    │  │  • pulls model from  │
-   │  • analytics aggs    │  │    Blob Storage      │
-   └──────────────────────┘  │  • emits logs to     │
-                             │    App Insights      │
-                             └──────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│              Streamlit Dashboard (Live)                      │
+│  Blood-flow canvas · Gauge · Radar · SHAP · LIME · PDF      │
+└──────────────┬──────────────┬──────────────┬────────────────┘
+               │              │              │
+       ┌───────▼──────┐ ┌─────▼──────┐ ┌────▼────────────┐
+       │   ML Core    │ │ XAI Layer  │ │  Uncertainty    │
+       │ RF champion  │ │ SHAP+LIME  │ │ Split-conformal │
+       │ AUC 0.969    │ │ Clinical   │ │ 90% guarantee   │
+       │ Brier 0.077  │ │ reasoning  │ │                 │
+       └──────────────┘ └────────────┘ └─────────────────┘
+               │
+       ┌───────▼──────────────┐     ┌────────────────────────┐
+       │   MongoDB Atlas      │     │   Azure ML (code-ready) │
+       │ predictions coll.    │     │ Managed Endpoint        │
+       │ model_registry coll. │     │ Blob Storage            │
+       │ Cohort analytics     │     │ Application Insights    │
+       └──────────────────────┘     └────────────────────────┘
 ```
 
 ---
 
-## 🔬 Technical highlights
+## 📊 Model Performance
 
-### 1. Calibrated ensemble champion selection
-- Four candidates: Logistic Regression, Random Forest, XGBoost, LightGBM
-- 5-fold stratified cross-validation, ranked by AUC-ROC
-- Champion refit on train+val with **isotonic calibration** so `predict_proba` outputs reflect real risk percentages
-- **Brier score** reported on test set as a calibration check (not just accuracy)
+**Champion: Random Forest** — selected by 5-fold stratified cross-validation
 
-### 2. XAI layer with three independent explainers
-- **SHAP** — TreeExplainer for the tree-based champion, KernelExplainer fallback. Waterfall, beeswarm, and force plots on demand.
-- **LIME** — used as a cross-check. If LIME and SHAP agree on the top contributors for a row, you trust both more.
-- **Counterfactuals** — greedy search over a step grid for mutable features (`chol`, `trestbps`, `thalach`, `oldpeak`) finds the smallest edit that pushes risk below a target threshold.
-- **Plain-English clinical insight** — "Your high resting BP raised your predicted risk by ≈ 11.4 percentage points."
+| Metric | Score | What it means |
+|---|---|---|
+| **AUC-ROC** | **0.9692** | Ranks sick above healthy 97% of the time |
+| **Accuracy** | 0.9016 | 90% of patients correctly classified |
+| **Recall** | **0.9286** | Catches 93 out of 100 real cardiac cases |
+| **Precision** | 0.8667 | 87% of flagged patients truly have disease |
+| **F1 Score** | 0.8966 | Strong balance of precision and recall |
+| **Brier Score** | **0.0766** | Excellent calibration — probabilities are honest |
 
-### 3. Uncertainty quantification — split-conformal prediction
-A separate calibration set (`X_val`) computes nonconformity scores, and the (1 − α) quantile becomes the half-width of a prediction interval with a formal coverage guarantee. **Every prediction in the dashboard ships with a 90% interval, not just a point estimate.**
+**All 4 candidates (CV AUC):**
 
-### 4. Fairness audit
-Subgroup metrics (accuracy, AUC, recall) across sex on the test set. The audit table is written into `metrics.json` and rendered in the dashboard's Model Card tab.
+| Model | CV AUC | Description |
+|---|---|---|
+| 🏆 **Random Forest** | **0.8792 ± 0.0376** | Champion — 400 trees, majority vote |
+| Logistic Regression | 0.8682 ± 0.0532 | Linear baseline, highly competitive |
+| XGBoost | 0.8508 ± 0.0425 | Sequential error-correcting trees |
+| LightGBM | 0.8481 ± 0.0418 | Leaf-wise boosting |
 
----
+**Fairness audit:**
 
-## 🗄 MongoDB integration — clinical data layer
-
-> See `mongo/README.md` for the full standalone story.
-
-Two collections:
-- **`predictions`** — patient ID, vitals, risk score, tier, SHAP attribution, counterfactual, timestamp. Indexed on `(patient_id, timestamp DESC)` and `risk_tier`.
-- **`model_registry`** — every trained champion writes a registry entry. In-house MLflow-lite.
-
-The dashboard's **Patient History** tab queries this layer for tier distributions, per-patient timelines, and aggregated high-risk feature patterns across the cohort.
+| Subgroup | n | Accuracy | AUC | Recall |
+|---|---|---|---|---|
+| Female | 20 | 0.950 | 1.000 | 0.857 |
+| Male | 41 | 0.878 | 0.950 | 0.952 |
 
 ---
 
-## ☁ Azure integration — MLOps backbone
+## 🔬 Explainability — The Core Innovation
 
-> See `azure/README.md` for the full standalone story.
+### SHAP (Primary Explainer)
+TreeExplainer computes **exact Shapley values** — mathematically guaranteed feature attribution. Not an approximation. Every prediction decomposes as:
 
-| Service | Role |
-|---|---|
-| Azure ML Managed Online Endpoint | Hosts the calibrated champion as a REST API |
-| Azure Blob Storage | Stores the `joblib` artifact — endpoint pulls dynamically, retrain = blob upload, no redeploy |
-| Azure Application Insights | Ingests structured logs from `score.py` (latency, volume, mean proba) |
-| Azure Container Apps *(optional)* | Containerized Streamlit dashboard for a fully-cloud demo |
+```
+final_risk = baseline + SHAP(age) + SHAP(chol) + SHAP(oldpeak) + ... + SHAP(thal)
+```
+
+### LIME (Independent Cross-check)
+Generates 5,000 perturbed patient variants, scores all of them, fits a local linear model — completely independent from SHAP. **Agreement between SHAP and LIME = high-confidence explanation.**
+
+### Deep Clinical Reasoning Engine
+The key differentiator. For each top feature, three layers of medical explanation are generated based on the actual raw value:
+
+**Example — ST Depression = 2.3mm:**
+- **What it means:** *"Marked ST segment depression — strong objective evidence of myocardial ischaemia."*
+- **How it affects the heart:** *"During ischaemia, the subendocardial myocardium depolarises abnormally, shifting the ECG's ST segment downward. Depression ≥2mm is a Class I indication for cardiac investigation."*
+- **What it leads to:** *"Predicts multi-vessel coronary disease. Associated with 5-10x increased cardiac event risk vs a negative stress test."*
+
+**Example — Reversible Thalassemia Defect:**
+- **What it means:** *"Thallium scan shows reduced blood flow under stress that recovers at rest — the direct imaging definition of myocardial ischaemia."*
+- **How it affects the heart:** *"A critically narrowed coronary artery cannot increase flow during stress. Thallium creates a cold spot in underperfused zones. At rest, flow recovers."*
+- **What it leads to:** *"Class I indication for coronary angiography. Tissue at immediate risk of infarction if the causative stenosis is untreated."*
+
+### Combined Clinical Conclusion
+All top factors synthesised into one conclusive medical verdict:
+> *"The dominant contributors are ST depression and thalassemia status — each independently associated with significant coronary artery disease. Together, this warrants urgent cardiovascular evaluation. Coronary angiography should be strongly considered."*
+
+### Counterfactual Explanations
+Greedy search over modifiable features (cholesterol, BP, heart rate, ST depression) finds the minimum real-world intervention:
+> *"If your cholesterol drops from 2.03 to 0.53 (scaled units), predicted risk falls from 30.7% to 14.4%."*
+
+### Conformal Prediction Intervals
+Split-conformal prediction provides a **90% coverage guarantee** — a mathematical theorem, not an estimate. Uses 46 validation patients as calibration. No Bayesian assumptions required.
 
 ---
 
-## 📁 Repository structure
+## 🗄 MongoDB — Clinical Data Layer
+
+**`predictions` collection** — one document per inference:
+```json
+{
+  "patient_id": "P-0001",
+  "timestamp": "2025-05-08T14:32:11Z",
+  "input_vitals": { "age": 54, "chol": 240, "oldpeak": 2.3 },
+  "risk_score": 0.73,
+  "risk_tier": "High",
+  "shap_values": { "ca": 0.18, "thal": 0.15, "oldpeak": 0.14 },
+  "counterfactual": "If cholesterol drops from 2.03 to 0.53...",
+  "interval": { "lower": 0.55, "upper": 0.91 }
+}
+```
+
+**`model_registry` collection** — in-house MLflow-lite tracking every trained model.
+
+**5 aggregation pipelines:**
+- Recent predictions timeline
+- Risk tier distribution chart
+- Top risk drivers across High/Critical cohort (`$objectToArray` on SHAP sub-document)
+- Weekly volume and mean risk trend
+- Per-patient history search
+
+---
+
+## 📁 Project Structure
 
 ```
 cardiolens/
-├── data/                         UCI Cleveland (auto-downloaded if not present)
-├── notebooks/                    EDA + modeling explorations
 ├── src/
-│   ├── data_loader.py            Load → clean → stratified split + scale
-│   ├── models.py                 4 candidates + CV champion + isotonic calibration
-│   ├── train.py                  End-to-end training entrypoint
-│   ├── evaluation.py             Metrics, ROC, Brier, fairness audit
-│   ├── xai.py                    SHAP + LIME + counterfactuals + interactions
-│   ├── uncertainty.py            Split-conformal prediction intervals
-│   ├── risk.py                   Low / Moderate / High / Critical tier mapping
-│   └── reports.py                Per-patient PDF generator
+│   ├── data_loader.py    # Load → clean → stratified split → StandardScaler
+│   ├── models.py         # 4 candidates + CV champion + isotonic calibration
+│   ├── train.py          # End-to-end training entrypoint
+│   ├── evaluation.py     # Metrics + ROC + Brier + fairness audit
+│   ├── xai.py            # SHAP + LIME + deep clinical reasoning engine
+│   │                     # + counterfactuals + combined conclusion
+│   ├── uncertainty.py    # Split-conformal prediction
+│   ├── risk.py           # 4-tier risk stratification
+│   └── reports.py        # ReportLab PDF generator
 ├── app/
-│   └── streamlit_app.py          The dashboard
+│   └── streamlit_app.py  # 5-tab dashboard with live MongoDB + animations
 ├── mongo/
-│   ├── schemas.py                Pydantic schemas
-│   ├── client.py                 PyMongo + index creation + log_prediction
-│   ├── analytics.py              Aggregations powering the History tab
-│   └── README.md                 Standalone Mongo story
+│   ├── schemas.py        # Pydantic v2 document schemas
+│   ├── client.py         # PyMongo client + index creation
+│   └── analytics.py      # 5 aggregation pipelines
 ├── azure/
-│   ├── deploy.py                 Azure ML SDK v2 deployment
-│   ├── score.py                  Endpoint scoring script (Blob load + App Insights logs)
-│   ├── blob_upload.py            Push trained artifact to Blob
-│   ├── conda.yaml                Inference environment
-│   └── README.md                 Standalone Azure story
-├── reports/                      Generated metrics, model artifact, PDFs
+│   ├── deploy.py         # Azure ML SDK v2 deployment
+│   ├── score.py          # Scoring script with App Insights logging
+│   └── blob_upload.py    # Push artifact to Blob Storage
+├── data/cleveland.csv    # UCI Cleveland Heart Disease (303 patients)
+├── reports/              # Model artifact + metrics + PDFs
 ├── requirements.txt
-├── .env.example
-├── .gitignore
-└── README.md
+└── .env.example
 ```
 
 ---
 
-## 🚀 Quickstart (local, no cloud needed)
+## 🚀 Run Locally
 
 ```bash
-git clone https://github.com/<your-username>/cardiolens.git
+git clone https://github.com/Aadithyaar22/cardiolens.git
 cd cardiolens
-python3.11 -m venv venv
-source venv/bin/activate
+
+# Create environment
+conda create -n cardiolens python=3.11 -y
+conda activate cardiolens
 pip install -r requirements.txt
 
-# Train champion + dump metrics + save artifact
+# Mac M-series only
+brew install libomp
+
+# Train the model
 python -m src.train
 
-# Run the dashboard
+# Launch
 streamlit run app/streamlit_app.py
 ```
 
-Open `http://localhost:8501`, fill in patient features in the sidebar, click **Predict risk**.
-
 ---
 
-## ☁ Cloud quickstart (Azure + MongoDB)
+## 🔧 Environment Variables
 
-```bash
-cp .env.example .env
-# fill in MONGO_URI and AZURE_* values
+Create `.env` in the project root:
 
-# 1. push the trained model to Blob
-python azure/blob_upload.py
+```env
+# MongoDB Atlas (free M0 tier)
+MONGO_URI=mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/
+CARDIOLENS_DB=cardiolens
 
-# 2. deploy to Azure ML
-python azure/deploy.py
+# Azure ML (optional)
+AZURE_SUBSCRIPTION_ID=
+AZURE_RESOURCE_GROUP=cardiolens-rg
+AZURE_WORKSPACE_NAME=cardiolens-workspace
+AZURE_ENDPOINT_URI=
+AZURE_ENDPOINT_KEY=
+AZURE_BLOB_CONNECTION_STRING=
 ```
 
-The dashboard's "Patient History" tab activates automatically once `MONGO_URI` is set.
-
 ---
 
-## 📊 Sample results (UCI Cleveland, 303 records)
+## 📦 Tech Stack
 
-| Metric | Champion (`xgb`, calibrated) |
+| Category | Technologies |
 |---|---|
-| Accuracy | 0.87 |
-| AUC-ROC | 0.92 |
-| F1 | 0.86 |
-| Precision | 0.85 |
-| Recall | 0.88 |
-| Brier score | 0.108 |
-
-*Numbers regenerate on every `python -m src.train` run; see `reports/metrics.json`.*
-
----
-
-## 🎤 Viva / demo talking points
-
-**On the ML pipeline.** "I picked the champion by AUC, not accuracy, because the dataset is class-imbalanced. I added isotonic calibration on top because XGBoost's raw probabilities are not honest — Brier score before calibration was about 0.18, after calibration around 0.11."
-
-**On the XAI layer.** "I run two independent explainers — SHAP and LIME — and a counterfactual search. SHAP tells you what drove the prediction. LIME validates SHAP. Counterfactuals tell the patient *what they could change*. Together they answer three different questions, not the same one three times."
-
-**On conformal prediction.** "The risk number alone is misleading without a sense of how confident the model is. Split-conformal gives me a 90% prediction interval with a formal coverage guarantee — no Bayesian assumptions needed."
-
-**On MongoDB.** "I'm using it as a clinical data layer. Document model fits because each prediction is a nested object — vitals, SHAP values, counterfactual all in one record. Compound index on `(patient_id, timestamp)` makes per-patient timelines a single index scan."
-
-**On Azure.** "I split the artifact from the deployment. Retraining is a blob upload, not a redeploy. The endpoint pulls the model in `init()` once. Application Insights ingests latency and volume from my structured logs — production monitoring without writing a separate observability stack."
-
-**On fairness.** "I sliced the test set by sex and reported subgroup AUC and recall. Recall on female patients was 0.04 lower — that's small but it's a thing I would surface to a reviewer rather than hide."
+| **ML** | scikit-learn, XGBoost, LightGBM, Random Forest |
+| **Explainability** | SHAP (TreeExplainer), LIME, custom clinical reasoning engine |
+| **Uncertainty** | Split-conformal prediction (custom) |
+| **Dashboard** | Streamlit, Plotly, HTML5 Canvas |
+| **Database** | MongoDB Atlas, PyMongo, Pydantic v2 |
+| **Cloud** | Azure ML, Azure Blob Storage, Azure Application Insights |
+| **Reports** | ReportLab |
+| **Deployment** | Streamlit Community Cloud |
+| **Language** | Python 3.11 |
 
 ---
 
-## 📌 Disclaimer
+## 📋 Dataset
 
-This is an educational project. The model is trained on a small public dataset (303 records, 1988) and is not validated for clinical use. Do not use for actual medical decisions.
+**UCI Cleveland Heart Disease Dataset**
+- 303 patients · 13 features · Collected 1988, Cleveland Clinic Foundation
+- Binary target: 0 = no disease, 1 = disease (any severity)
+- [UCI ML Repository](https://archive.ics.uci.edu/ml/datasets/Heart+Disease)
+
+---
+
+## ⚠️ Disclaimer
+
+CardioLens is an educational and research project. It is not validated for clinical use and does not constitute medical advice. All predictions and explanations are for demonstration purposes only. Consult a qualified clinician for any medical decisions.
 
 ---
 
 ## 📄 License
 
-MIT
+MIT License — free to use, modify, and distribute with attribution.
+
+---
+
+## 👥 Built By
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <br>
+      <strong>Aadithya A R</strong><br>
+      <sub>B.Tech CSE (AI & ML)</sub><br>
+      <sub>Global Academy of Technology, Bengaluru · Batch 2023–2027</sub><br>
+      <sub>Agentic AI Intern · Innomatics Research Labs</sub><br><br>
+      <sub>ML Pipeline · XAI Engine · Clinical Reasoning · Dashboard · MongoDB · Deployment</sub><br><br>
+      <a href="https://github.com/Aadithyaar22">
+        <img src="https://img.shields.io/badge/GitHub-Aadithyaar22-black?logo=github&style=flat-square" />
+      </a>
+    </td>
+    <td align="center" width="50%">
+      <br>
+      <strong>Yadunandan</strong><br>
+      <sub>B.Tech CSE</sub><br>
+      <sub>Global Academy of Technology, Bengaluru</sub><br><br>
+      <sub>Co-Builder · Project Architecture · Research · Testing · Validation</sub><br><br>
+      <a href="https://github.com">
+        <img src="https://img.shields.io/badge/GitHub-Yadunandan-black?logo=github&style=flat-square" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<div align="center">
+  <sub>Built with ❤️ at Global Academy of Technology, Bengaluru, India</sub><br><br>
+  <sub>⭐ Star this repo if you found it useful</sub>
+</div>
