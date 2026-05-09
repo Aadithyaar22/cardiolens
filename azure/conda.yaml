@@ -1,0 +1,15 @@
+name: cardiolens-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - scikit-learn==1.5.2
+      - xgboost==2.1.1
+      - lightgbm==4.5.0
+      - pandas==2.2.3
+      - numpy==1.26.4
+      - joblib==1.4.2
+      - azure-storage-blob==12.23.1
+      - opencensus-ext-azure==1.1.13

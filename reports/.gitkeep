@@ -1,0 +1,2 @@
+# Generated artifacts (model, metrics, PDF reports) land here after running:
+#   python -m src.train
