@@ -300,7 +300,7 @@ MIT License — free to use, modify, and distribute with attribution.
     </td>
     <td align="center" width="50%">
       <br>
-      <strong>Yadunandan</strong><br>
+      <strong>Yadunandan M Nimbalkar</strong><br>
       <sub>B.Tech CSE (AI & ML)</sub><br>
       <sub>Global Academy of Technology, Bengaluru</sub><br>
       <sub>Co-Builder · Project Architecture · Research · Testing · Validation</sub><br><br>
