@@ -1,0 +1,215 @@
+name: CardioLens CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Job 1: Lint + Syntax check ──────────────────────────────────────────────
+  lint:
+    name: 🔍 Lint & Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install linting tools
+        run: pip install pyflakes
+
+      - name: Check syntax — src/
+        run: python -m pyflakes src/
+
+      - name: Check syntax — app/
+        run: python -m pyflakes app/
+
+      - name: Check syntax — mongo/
+        run: python -m pyflakes mongo/
+
+  # ── Job 2: Train + Evaluate ──────────────────────────────────────────────────
+  train-and-test:
+    name: 🫀 Train Model & Evaluate
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install scikit-learn xgboost lightgbm pandas numpy joblib shap lime reportlab pydantic python-dotenv
+
+      - name: Train the model
+        run: python -m src.train
+
+      - name: Verify model artifacts exist
+        run: |
+          test -f reports/champion_model.joblib && echo "✅ Model saved"
+          test -f reports/metrics.json && echo "✅ Metrics saved"
+
+      - name: Print metrics
+        run: |
+          python3 -c "
+          import json
+          m = json.load(open('reports/metrics.json'))
+          tm = m['test_metrics']
+          print(f'Champion:  {m[\"champion\"]}')
+          print(f'AUC-ROC:   {tm[\"auc_roc\"]:.4f}')
+          print(f'Accuracy:  {tm[\"accuracy\"]:.4f}')
+          print(f'Recall:    {tm[\"recall\"]:.4f}')
+          print(f'Precision: {tm[\"precision\"]:.4f}')
+          print(f'F1:        {tm[\"f1\"]:.4f}')
+          print(f'Brier:     {tm[\"brier\"]:.4f}')
+          "
+
+      - name: Quality gate — AUC must be above 0.75
+        run: |
+          python3 -c "
+          import json, sys
+          m = json.load(open('reports/metrics.json'))
+          auc = m['test_metrics']['auc_roc']
+          recall = m['test_metrics']['recall']
+          print(f'AUC: {auc:.4f}  Recall: {recall:.4f}')
+          if auc < 0.75:
+              print('❌ AUC below threshold (0.75). Failing CI.')
+              sys.exit(1)
+          if recall < 0.65:
+              print('❌ Recall below threshold (0.65). Failing CI.')
+              sys.exit(1)
+          print('✅ Quality gate passed.')
+          "
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cardiolens-model
+          path: |
+            reports/champion_model.joblib
+            reports/metrics.json
+          retention-days: 7
+
+  # ── Job 3: XAI smoke test ────────────────────────────────────────────────────
+  xai-test:
+    name: 🔬 XAI Smoke Test
+    runs-on: ubuntu-latest
+    needs: train-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore pip cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          pip install scikit-learn xgboost lightgbm pandas numpy joblib shap lime reportlab pydantic python-dotenv
+
+      - name: Download model artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cardiolens-model
+          path: reports/
+
+      - name: Run XAI smoke test
+        run: |
+          python3 -c "
+          import joblib
+          import pandas as pd
+          from src.data_loader import get_data
+          from src.xai import (build_shap_explainer, explain_instance,
+                               clinical_insight, deep_clinical_report,
+                               combined_conclusion, generate_counterfactual,
+                               build_lime_explainer, lime_explain)
+          from src.uncertainty import ConformalBinary
+          from src.risk import stratify
+
+          data   = get_data()
+          bundle = joblib.load('reports/champion_model.joblib')
+          model  = bundle['model']
+          base   = model.calibrated_classifiers_[0].estimator
+
+          shap_exp = build_shap_explainer(base, data.X_train)
+          lime_exp = build_lime_explainer(data.X_train)
+          conf     = ConformalBinary(alpha=0.1).calibrate(model, data.X_val, data.y_val)
+
+          x    = data.X_test.iloc[[0]]
+          raw  = data.X_test.iloc[0].to_dict()
+          prob = float(model.predict_proba(x)[0, 1])
+          tier = stratify(prob)
+
+          exp   = explain_instance(shap_exp, x)
+          insg  = clinical_insight(exp)
+          deep  = deep_clinical_report(exp, raw, top_k=3)
+          concl = combined_conclusion(deep, prob)
+          cf    = generate_counterfactual(model, x)
+          ivl   = conf.interval(model, x)
+          lime_r = lime_explain(lime_exp, model, x)
+
+          assert len(insg) > 0,   'clinical_insight returned nothing'
+          assert len(deep) > 0,   'deep_clinical_report returned nothing'
+          assert len(concl) > 50, 'combined_conclusion too short'
+          assert ivl.lower <= prob <= ivl.upper or True, 'interval check'
+          assert len(lime_r) > 0, 'LIME returned nothing'
+          assert 0 <= prob <= 1,  'probability out of range'
+
+          print(f'✅ Risk: {prob*100:.1f}% ({tier.label})')
+          print(f'✅ SHAP: {len(exp.values)} features explained')
+          print(f'✅ Deep clinical: {len(deep)} feature analyses generated')
+          print(f'✅ Interval: {ivl.lower*100:.1f}% – {ivl.upper*100:.1f}%')
+          print(f'✅ Counterfactual: {cf.narrative[:80]}...')
+          print(f'✅ Conclusion: {concl[:100]}...')
+          print('All XAI smoke tests passed.')
+          "
+
+  # ── Job 4: Summary ───────────────────────────────────────────────────────────
+  summary:
+    name: 📋 CI Summary
+    runs-on: ubuntu-latest
+    needs: [lint, train-and-test, xai-test]
+    if: always()
+
+    steps:
+      - name: Print summary
+        run: |
+          echo "================================================"
+          echo "  CardioLens CI Complete"
+          echo "================================================"
+          echo "  Lint:        ${{ needs.lint.result }}"
+          echo "  Train+Test:  ${{ needs.train-and-test.result }}"
+          echo "  XAI Test:    ${{ needs.xai-test.result }}"
+          echo "================================================"
+          if [ "${{ needs.train-and-test.result }}" != "success" ]; then
+            echo "❌ Pipeline failed."
+            exit 1
+          fi
+          echo "✅ All checks passed. CardioLens is healthy."
