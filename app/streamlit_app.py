@@ -364,6 +364,22 @@ FNAMES = {
 # ── Cached resources ─────────────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
+    # Try Azure Blob Storage first, fall back to local
+    conn = os.getenv("AZURE_BLOB_CONNECTION_STRING")
+    if conn:
+        try:
+            from azure.storage.blob import BlobServiceClient
+            from io import BytesIO
+            service = BlobServiceClient.from_connection_string(conn)
+            container = os.getenv("MODEL_BLOB_CONTAINER", "cardiolens-models")
+            blob_name = os.getenv("MODEL_BLOB_NAME", "champion_model.joblib")
+            blob = service.get_blob_client(container=container, blob=blob_name)
+            buf = BytesIO()
+            blob.download_blob().readinto(buf)
+            buf.seek(0)
+            return joblib.load(buf)
+        except Exception as e:
+            st.toast(f"Azure Blob failed, using local model: {e}", icon="⚠️")
     path = REPO_ROOT/"reports"/"champion_model.joblib"
     if not path.exists():
         st.error("Run `python -m src.train` first.")
@@ -519,8 +535,10 @@ st.markdown("""
 # ── Status bar ───────────────────────────────────────────────────────────────
 mongo_color = "#15803d" if MONGO_AVAILABLE else "#5c4040"
 mongo_label = "MongoDB connected" if MONGO_AVAILABLE else "MongoDB offline"
-azure_color = "#15803d" if AZURE_AVAILABLE else "#5c4040"
-azure_label = "Azure endpoint active" if AZURE_AVAILABLE else "Azure offline"
+blob_conn = os.getenv("AZURE_BLOB_CONNECTION_STRING", "")
+azure_color = "#15803d" if blob_conn else "#5c4040"
+azure_label = "Azure Blob Storage connected" if blob_conn else "Azure offline"
+AZURE_AVAILABLE = bool(blob_conn)
 st.markdown(f"""
 <div style='display:flex;gap:20px;margin-bottom:6px;align-items:center;'>
   <span style='font-family:"JetBrains Mono",monospace;font-size:11px;color:#5c4040;'>SYSTEM STATUS</span>
