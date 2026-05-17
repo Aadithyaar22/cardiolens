@@ -596,23 +596,7 @@ if predict_btn:
         except Exception as e:
             st.toast(f"MongoDB write failed: {e}", icon="⚠️")
 
-    # ── Score via Azure endpoint (if available) ──────────────────────────────
-    if AZURE_AVAILABLE:
-        try:
-            import requests
-            resp = requests.post(
-                AZURE_URI,
-                headers={"Authorization":f"Bearer {AZURE_KEY}",
-                         "Content-Type":"application/json"},
-                json={"data":[raw]},
-                timeout=8,
-            )
-            if resp.ok:
-                az_result = resp.json()
-                st.session_state.azure_proba = az_result.get("probabilities",[proba])[0]
-                st.toast("✅ Azure endpoint responded", icon="☁️")
-        except Exception as e:
-            st.toast(f"Azure call failed: {e}", icon="⚠️")
+
 
 # ── Empty state ───────────────────────────────────────────────────────────────
 if "R" not in st.session_state:
