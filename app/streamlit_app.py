@@ -39,12 +39,9 @@ try:
 except Exception:
     MONGO_AVAILABLE = False
 
-try:
-    AZURE_URI  = os.getenv("AZURE_ENDPOINT_URI", "")
-    AZURE_KEY  = os.getenv("AZURE_ENDPOINT_KEY", "")
-    AZURE_AVAILABLE = bool(AZURE_URI and AZURE_KEY)
-except Exception:
-    AZURE_AVAILABLE = False
+AZURE_URI = os.getenv("AZURE_ENDPOINT_URI", "")
+AZURE_KEY = os.getenv("AZURE_ENDPOINT_KEY", "")
+AZURE_AVAILABLE = bool(AZURE_URI and AZURE_KEY)
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
