@@ -31,6 +31,30 @@ from src.xai import (
 )
 from src.reports import build_report
 
+# ── Application Insights logging ─────────────────────────────────────────────
+def log_to_insights(patient_id, proba, tier_label, raw):
+    try:
+        key = os.getenv("APPINSIGHTS_INSTRUMENTATION_KEY", "")
+        if not key:
+            return
+        from opencensus.ext.azure.log_exporter import AzureLogHandler
+        import logging
+        logger = logging.getLogger("cardiolens")
+        if not any(isinstance(h, AzureLogHandler) for h in logger.handlers):
+            logger.addHandler(AzureLogHandler(
+                connection_string=f"InstrumentationKey={key}"))
+            logger.setLevel(logging.INFO)
+        logger.info("prediction", extra={"custom_dimensions": {
+            "patient_id": patient_id,
+            "risk_score": round(proba * 100, 2),
+            "risk_tier": tier_label,
+            "age": raw.get("age"),
+            "chol": raw.get("chol"),
+            "thalach": raw.get("thalach"),
+        }})
+    except Exception:
+        pass
+
 # ── Optional integrations (graceful fallback) ────────────────────────────────
 try:
     from mongo.client import log_prediction, get_client
@@ -581,6 +605,9 @@ if predict_btn:
                                insg=insg,cf=cf,lime_r=lime_r,raw=raw,
                                pid=patient_id,ts=datetime.now(timezone.utc),
                                deep=deep,concl=concl)
+
+    # ── Log to Application Insights ─────────────────────────────────────────
+    log_to_insights(patient_id, proba, tier.label, raw)
 
     # ── Log to MongoDB ───────────────────────────────────────────────────────
     if MONGO_AVAILABLE:
